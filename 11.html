@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信图片展示生成器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            padding: 30px;
+            position: relative;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #1a2980, #26d0ce);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .upload-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        .section-title i {
+            color: #1a2980;
+        }
+        
+        .upload-area {
+            border: 3px dashed #1a2980;
+            border-radius: 15px;
+            padding: 35px 20px;
+            text-align: center;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 25px;
+        }
+        
+        .upload-area:hover {
+            background: #e6f7ff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(26, 41, 128, 0.2);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            color: #1a2980;
+            margin-bottom: 15px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .preview-container {
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .preview-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+            border: 3px solid white;
+        }
+        
+        .result-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #eaeaea;
+            margin-top: 20px;
+        }
+        
+        .link-display {
+            background: #f0f7ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-size: 0.9rem;
+            border: 1px dashed #1a2980;
+        }
+        
+        .instructions {
+            background: #e6f7ff;
+            border-left: 4px solid #1a2980;
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin-top: 30px;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions ol {
+            padding-left: 25px;
+        }
+        
+        .instructions li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #1a2980, #26d0ce);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(26, 41, 128, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(26, 41, 128, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .btn i {
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .wechat-tip {
+            color: #25a75c;
+            font-weight: bold;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fab fa-weixin"></i> 微信图片展示生成器</h1>
+            <p class="subtitle">上传图片 · 获取专属链接 · 微信扫码查看</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="upload-section">
+                <h2 class="section-title"><i class="fas fa-cloud-upload-alt"></i> 上传图片</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <h3>点击或拖拽上传图片</h3>
+                    <p>支持 JPG, PNG 格式，最大5MB</p>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*">
+                </div>
+                
+                <div class="preview-container">
+                    <h3 class="preview-title"><i class="fas fa-eye"></i> 图片预览</h3>
+                    <img id="previewImage" class="preview-image" alt="图片预览">
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h2 class="section-title"><i class="fas fa-link"></i> 生成展示链接</h2>
+                
+                <div class="result-box">
+                    <p>上传图片后，将生成专属展示链接：</p>
+                    <div class="link-display" id="linkDisplay">
+                        请先上传图片...
+                    </div>
+                    <button id="copyBtn" class="btn" disabled>
+                        <i class="fas fa-copy"></i> 复制链接
+                    </button>
+                    <p class="wechat-tip"><i class="fab fa-weixin"></i> 复制此链接到草料二维码生成器制作二维码</p>
+                </div>
+                
+                <div class="instructions">
+                    <h3><i class="fas fa-lightbulb"></i> 使用说明</h3>
+                    <ol>
+                        <li>上传您想要展示的图片</li>
+                        <li>系统将生成一个专属展示链接</li>
+                        <li>复制该链接并前往草料二维码网站</li>
+                        <li>在草料二维码生成器中粘贴链接并生成二维码</li>
+                        <li>用户微信扫码后只看到图片，无其他内容</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 微信图片展示生成器 | 基于GitHub Pages的解决方案</p>
+            <p>提示：此工具完全在浏览器中运行，图片数据不会上传到服务器</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+            const previewImage = document.getElementById('previewImage');
+            const linkDisplay = document.getElementById('linkDisplay');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            // 点击上传区域触发文件选择
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // 拖拽功能
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = '#e6f7ff';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.backgroundColor = '#fff';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = '#fff';
+                
+                if (e.dataTransfer.files.length) {
+                    handleImageUpload(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // 文件选择处理
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleImageUpload(e.target.files[0]);
+                }
+            });
+            
+            // 处理图片上传
+            function handleImageUpload(file) {
+                // 检查文件类型
+                if (!file.type.match('image.*')) {
+                    alert('请上传图片文件（JPG/PNG）');
+                    return;
+                }
+                
+                // 检查文件大小（5MB以内）
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('图片大小不能超过5MB');
+                    return;
+                }
+                
+                // 预览图片
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    
+                    // 生成展示链接
+                    generateDisplayLink(e.target.result);
+                    
+                    // 启用复制按钮
+                    copyBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // 生成展示链接
+            function generateDisplayLink(imageData) {
+                // 创建图片展示页面的HTML内容
+                const imageHTML = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <style>
+                            * {
+                                margin: 0;
+                                padding: 0;
+                                box-sizing: border-box;
+                            }
+                            body {
+                                background: #000;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                min-height: 100vh;
+                                overflow: hidden;
+                            }
+                            .image-container {
+                                max-width: 100%;
+                                max-height: 100vh;
+                                text-align: center;
+                            }
+                            .image-container img {
+                                max-width: 100%;
+                                max-height: 100vh;
+                                object-fit: contain;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="image-container">
+                            <img src="${imageData}" alt="展示图片">
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                // 创建Blob对象
+                const blob = new Blob([imageHTML], {type: 'text/html'});
+                
+                // 创建对象URL
+                const objectUrl = URL.createObjectURL(blob);
+                
+                // 显示链接
+                linkDisplay.innerHTML = `<i class="fas fa-link"></i> ${objectUrl}`;
+            }
+            
+            // 复制链接
+            copyBtn.addEventListener('click', () => {
+                const text = linkDisplay.textContent || linkDisplay.innerText;
+                
+                navigator.clipboard.writeText(text).then(() => {
+                    // 显示成功消息
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制到剪贴板';
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                    alert('复制失败，请手动复制链接');
+                });
+            });
+            
+            // 初始化页面
+            const defaultImage = 'https://images.unsplash.com/photo-1543857778-c4a1a569e7bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
+            previewImage.src = defaultImage;
+            previewImage.style.display = 'block';
+            generateDisplayLink(defaultImage);
+            copyBtn.disabled = false;
+        });
+    </script>
+</body>
+</html>
